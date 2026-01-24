@@ -52,7 +52,7 @@ export default function AdminOrderDetailsPage() {
         {order.items.map((item, i) => (
           <div key={i} className="flex gap-4 border-b pb-3">
             {item.image && (
-              <image
+              <img
                 src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${item.image}`}
                 className="h-16 w-14 object-cover rounded"
               />

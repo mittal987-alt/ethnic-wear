@@ -51,7 +51,7 @@ export default function ProductDetailPage() {
   return (
     <main className="max-w-5xl mx-auto px-6 py-12 grid md:grid-cols-2 gap-10">
       
-      {/* IMAGE */}
+    
       <div className="bg-gray-100 h-96 flex items-center justify-center rounded">
         {product.image ? (
           <img
