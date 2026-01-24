@@ -55,7 +55,7 @@ export default function ProductDetailPage() {
       <div className="bg-gray-100 h-96 flex items-center justify-center rounded">
         {product.image ? (
           <img
-            src={`${process.env.NEXT_PUBLIC_API_URL.replace("/api", "")}${product.image}`}
+            src={`${process.env.NEXT_PUBLIC_Backend_URL.replace("/api", "")}${product.image}`}
             alt={product.title}
             className="w-full h-full object-cover rounded"
           />
