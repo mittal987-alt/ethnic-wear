@@ -1,0 +1,16 @@
+# ===== BACKEND =====
+backend/node_modules/
+backend/.env
+backend/uploads/
+
+# ===== FRONTEND =====
+frontend/node_modules/
+frontend/.env.local
+frontend/.next/
+frontend/out/
+
+# ===== COMMON =====
+.env
+dist/
+build/
+coverage/
