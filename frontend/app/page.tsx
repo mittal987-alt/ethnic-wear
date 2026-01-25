@@ -1,12 +1,7 @@
 import Link from "next/link";
 
-interface Product {
-  _id: string;
-  title: string;
-  price: number;
-  category: string;
-  image?: string;
-}
+import { Product } from "@/types/product";
+
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 

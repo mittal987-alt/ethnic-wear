@@ -1,13 +1,6 @@
 import ProductCard from "../../../component/ProductCard";
 
-interface Product {
-  _id: string;
-  title: string;
-  price: number;
-  category?: string;
-  image?: string;
-}
-
+import { Product } from "@/types/product";
 export default async function CategoryPage({
   params,
 }: {

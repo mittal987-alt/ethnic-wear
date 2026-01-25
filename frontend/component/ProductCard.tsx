@@ -1,12 +1,8 @@
 import Link from "next/link";
+import { Product } from "@/types/product";
+
 import WishlistButton from "./WishlistButton";
-interface Product {
-  _id: string;
-  title: string;
-  price: number;
-  category: string;
-  image?: string; // 👈 ADD THIS
-}
+
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
