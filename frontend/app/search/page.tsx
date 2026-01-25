@@ -17,7 +17,7 @@ export default async function SearchPage({
   const keyword = searchParams.keyword || "";
 
   const res = await fetch(
-    `http://localhost:5000/api/products/search?keyword=${encodeURIComponent(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products/search?keyword=${encodeURIComponent(
       keyword
     )}`,
     { cache: "no-store" }
@@ -45,7 +45,7 @@ export default async function SearchPage({
             <div className="h-60 bg-gray-100">
               {product.image ? (
                 <img
-                  src={`http://localhost:5000${product.image}`}
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${product.image}`}
                   alt={product.title}
                   className="h-full w-full object-cover"
                 />

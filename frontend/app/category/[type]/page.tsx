@@ -20,7 +20,7 @@ export default async function CategoryPage({
   const category = type.toLowerCase();
 
   const res = await fetch(
-    "http://localhost:5000/api/products",
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products`,
     { cache: "no-store" }
   );
 
