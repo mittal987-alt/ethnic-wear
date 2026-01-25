@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
+/* ---------- TYPES ---------- */
+
 interface CartItem {
   _id: string;
   title: string;
@@ -15,9 +17,14 @@ interface CartContextType {
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, qty: number) => void;
+  clearCart: () => void;
 }
 
+/* ---------- CONTEXT ---------- */
+
 const CartContext = createContext<CartContextType | null>(null);
+
+/* ---------- PROVIDER ---------- */
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -59,14 +66,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const clearCart = () => {
+    setCart([]);
+  };
+
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, updateQuantity }}
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+      }}
     >
       {children}
     </CartContext.Provider>
   );
 }
+
+/* ---------- HOOK ---------- */
 
 export const useCart = () => {
   const ctx = useContext(CartContext);
