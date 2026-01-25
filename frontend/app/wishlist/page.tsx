@@ -1,17 +1,44 @@
+"use client";
+
 import ProductCard from "@/component/ProductCard";
+import { useEffect, useState } from "react";
 
-export default async function WishlistPage() {
-  const res = await fetch(
-    "http://localhost:5000/api/wishlist",
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      cache: "no-store",
-    }
-  );
+/* ---------- TYPE ---------- */
+interface Product {
+  _id: string;
+  title: string;
+  price: number;
+  category: string;
+  image?: string;
+}
 
-  const products = await res.json();
+/* ---------- PAGE ---------- */
+export default function WishlistPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/wishlist`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+      setProducts(data);
+      setLoading(false);
+    };
+
+    fetchWishlist();
+  }, []);
+
+  if (loading) return <p className="p-10">Loading wishlist...</p>;
 
   return (
     <main className="max-w-7xl mx-auto px-6 py-10">
@@ -21,7 +48,7 @@ export default async function WishlistPage() {
         <p>No items in wishlist</p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {products.map((p) => (
+          {products.map((p: Product) => (
             <ProductCard key={p._id} product={p} />
           ))}
         </div>
