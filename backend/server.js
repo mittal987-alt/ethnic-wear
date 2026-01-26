@@ -24,10 +24,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://ethnic-wear-cu3w.vercel.app"
-    ],
+    origin: true,
     credentials: true,
   })
 );
