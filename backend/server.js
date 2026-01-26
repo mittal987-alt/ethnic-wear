@@ -22,16 +22,16 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 
-// ✅ CORS (WORKS FOR LOCAL + VERCEL)
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://your-frontend.vercel.app", // add later
+      "https://ethnic-wear-cu3w.vercel.app"
     ],
     credentials: true,
   })
 );
+
 
 // ✅ Serve uploaded images
 const __dirname = path.resolve();
