@@ -1,26 +1,27 @@
 import Link from "next/link";
 import { Product } from "@/types/product";
-
 import WishlistButton from "./WishlistButton";
-
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
     <Link href={`/product/${product._id}`}>
       <div className="border rounded cursor-pointer hover:shadow transition overflow-hidden">
-         <WishlistButton productId={product._id} />
-<div className="h-60 bg-gray-100">
-                  {product.image ? (
-                    <img  className="w-full h-48 sm:h-56 object-cover rounded" 
-                      src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${product.image}`}
-                      alt={product.title}
-                      />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-gray-400">
-                      Image coming soon
-                    </div>
-                  )}
-                </div>
+        <WishlistButton productId={product._id} />
+
+        {/* IMAGE */}
+        <div className="h-60 bg-gray-100">
+          {product.image ? (
+            <img
+              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${product.image}`}
+              alt={product.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center text-gray-400">
+              Image coming soon
+            </div>
+          )}
+        </div>
 
         {/* CONTENT */}
         <div className="p-4">
