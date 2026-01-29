@@ -21,7 +21,8 @@ export default function CartPage() {
   }
 
   return (
-    <main className="max-w-5xl mx-auto px-6 py-10">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
       <h1 className="text-2xl font-semibold mb-6">Your Cart</h1>
 
       {cart.map((item) => (
@@ -32,8 +33,7 @@ export default function CartPage() {
           {item.image && (
             <img
               src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${item.image}`}
-              className="h-24 w-20 object-cover rounded"
-            />
+               className="w-full h-48 sm:h-56 object-cover rounded"  />
           )}
 
           <div className="flex-1">

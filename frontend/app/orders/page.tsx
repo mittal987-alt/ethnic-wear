@@ -67,7 +67,8 @@ export default function MyOrdersPage() {
   }
 
   return (
-    <main className="max-w-5xl mx-auto px-6 py-10">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
       <h1 className="text-2xl font-semibold mb-6">My Orders</h1>
 
       <div className="space-y-6">
@@ -99,7 +100,7 @@ export default function MyOrdersPage() {
                     <img
                       src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${item.image}`}
                       alt={item.title}
-                      className="h-16 w-14 object-cover rounded"
+                      c className="w-full h-48 sm:h-56 object-cover rounded" 
                     />
                   )}
 

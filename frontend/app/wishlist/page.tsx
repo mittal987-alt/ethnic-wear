@@ -47,7 +47,7 @@ export default function WishlistPage() {
       {products.length === 0 ? (
         <p>No items in wishlist</p>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {products.map((p: Product) => (
             <ProductCard key={p._id} product={p} />
           ))}

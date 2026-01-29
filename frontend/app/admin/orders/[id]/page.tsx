@@ -31,7 +31,8 @@ export default function AdminOrderDetailsPage() {
   if (!order) return <p className="p-10">Loading order...</p>;
 
   return (
-    <main className="max-w-5xl mx-auto px-6 py-10">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
       <h1 className="text-2xl font-semibold mb-6">
         Order Details
       </h1>
@@ -52,10 +53,10 @@ export default function AdminOrderDetailsPage() {
         {order.items.map((item, i) => (
           <div key={i} className="flex gap-4 border-b pb-3">
             {item.image && (
-              <img
+              <img className="w-full h-48 sm:h-56 object-cover rounded" 
+
                 src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${item.image}`}
-                className="h-16 w-14 object-cover rounded"
-              />
+                  />
             )}
 
             <div className="flex-1">

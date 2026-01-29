@@ -55,17 +55,18 @@ export default async function HomePage() {
           <p className="text-gray-500">No trending products yet</p>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4
+ gap-6">
           {trendingProducts.map((p) => (
             <Link
               key={p._id}
               href={`/product/${p._id}`}
               className="border rounded-lg overflow-hidden hover:shadow-lg transition"
             >
-              <img
+              <img className="w-full h-48 sm:h-56 object-cover rounded" 
                 src={`${BACKEND_URL}${p.image}`}
                 alt={p.title}
-                className="h-60 w-full object-cover"
+               
               />
 
               <div className="p-4">
@@ -88,18 +89,19 @@ export default async function HomePage() {
             <p className="text-gray-500">No new arrivals</p>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {newArrivals.map((p) => (
               <Link
                 key={p._id}
                 href={`/product/${p._id}`}
                 className="border rounded-lg overflow-hidden hover:shadow-lg transition bg-white"
               >
-                <img
-                  src={`${BACKEND_URL}${p.image}`}
-                  alt={p.title}
-                  className="h-60 w-full object-cover"
-                />
+                  <img className="w-full h-48 sm:h-56 object-cover rounded" 
+                src={`${BACKEND_URL}${p.image}`}
+                alt={p.title}
+               
+              />
+
 
                 <div className="p-4">
                   <h3 className="font-medium">{p.title}</h3>

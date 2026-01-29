@@ -49,15 +49,15 @@ export default function ProductDetailPage() {
   if (!product) return <p className="p-10">Product not found</p>;
 
   return (
-    <main className="max-w-5xl mx-auto px-6 py-12 grid md:grid-cols-2 gap-10">
-      
+   <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+  
     
       <div className="bg-gray-100 h-96 flex items-center justify-center rounded">
         {product.image ? (
           <img
   src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${product.image}`}
   alt={product.title}
-  className="w-full h-full object-cover rounded"
+  className="w-full h-48 sm:h-56 object-cover rounded" 
 />
 
 

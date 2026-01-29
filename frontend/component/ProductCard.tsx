@@ -11,11 +11,10 @@ export default function ProductCard({ product }: { product: Product }) {
          <WishlistButton productId={product._id} />
 <div className="h-60 bg-gray-100">
                   {product.image ? (
-                    <img
+                    <img  className="w-full h-48 sm:h-56 object-cover rounded" 
                       src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${product.image}`}
                       alt={product.title}
-                      className="h-full w-full object-cover"
-                    />
+                      />
                   ) : (
                     <div className="flex h-full items-center justify-center text-gray-400">
                       Image coming soon

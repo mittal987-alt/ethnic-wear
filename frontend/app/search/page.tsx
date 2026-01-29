@@ -26,7 +26,8 @@ export default async function SearchPage({
   const products: Product[] = res.ok ? await res.json() : [];
 
   return (
-    <main className="max-w-7xl mx-auto px-6 py-10">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
       <h1 className="text-2xl font-semibold mb-6">
         Search results for “{keyword}”
       </h1>
@@ -35,7 +36,7 @@ export default async function SearchPage({
         <p className="text-gray-500">No products found</p>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {products.map((product) => (
           <Link
             key={product._id}
@@ -47,8 +48,7 @@ export default async function SearchPage({
                 <img
                   src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${product.image}`}
                   alt={product.title}
-                  className="h-full w-full object-cover"
-                />
+                   className="w-full h-48 sm:h-56 object-cover rounded"  />
               ) : (
                 <div className="flex h-full items-center justify-center text-gray-400">
                   Image coming soon

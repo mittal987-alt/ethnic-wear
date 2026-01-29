@@ -32,7 +32,8 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="max-w-md mx-auto px-6 py-16">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
       <h1 className="text-2xl font-semibold mb-6 text-center">Login</h1>
 
       <input

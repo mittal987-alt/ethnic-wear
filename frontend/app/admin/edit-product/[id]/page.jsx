@@ -10,8 +10,9 @@ export default async function EditProductPage({ params }) {
   };
 
   return (
-    <main className="max-w-3xl mx-auto px-6 py-10">
-      <h1 className="text-2xl font-semibold mb-6">
+   <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-6 md:py-12">
+
+     <h1 className="text-2xl font-semibold mb-6">
         Edit Product (ID: {id})
       </h1>
 

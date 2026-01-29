@@ -57,7 +57,8 @@ export default function EditProductPage() {
   }
 
   return (
-    <main className="max-w-xl mx-auto px-6 py-12">
+   <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
       <h1 className="text-2xl font-semibold mb-6">Edit Product</h1>
 
       {/* TITLE */}
@@ -107,8 +108,7 @@ export default function EditProductPage() {
           <img
             src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${currentImage}`}
             alt="Current"
-            className="h-40 object-cover rounded"
-          />
+             className="w-full h-48 sm:h-56 object-cover rounded"   />
         </div>
       )}
       

@@ -3,170 +3,113 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../../context/CartContext";
-import API from "../../services/api";
 
 export default function CheckoutPage() {
+  const { cart } = useCart();
   const router = useRouter();
-  const { cart, clearCart } = useCart();
 
   const [fullName, setFullName] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [pincode, setPincode] = useState("");
   const [phone, setPhone] = useState("");
-  const [paymentMethod, setPaymentMethod] =
-    useState<"COD" | "RAZORPAY">("COD");
+  const [payment, setPayment] = useState("cod");
 
-  const totalAmount = cart.reduce(
+  const total = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
-  /* LOAD RAZORPAY SCRIPT */
-  const loadRazorpay = () =>
-    new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src =
-        "https://checkout.razorpay.com/v1/checkout.js";
-      script.onload = () => resolve(true);
-      document.body.appendChild(script);
-    });
-
-  /* PLACE ORDER */
-  const placeOrder = async () => {
-    if (!cart.length) return;
-
-    try {
-      // 1️⃣ CREATE ORDER (BACKEND)
-      const { data: order } = await API.post("/orders", {
-        items: cart,
-        totalAmount,
-        shippingAddress: {
-          fullName,
-          address,
-          city,
-          pincode,
-          phone,
-        },
-        paymentMethod,
-      });
-
-      // 2️⃣ COD FLOW
-      if (paymentMethod === "COD") {
-        clearCart();
-        alert("Order placed with Cash on Delivery");
-        router.push("/orders");
-        return;
-      }
-
-      // 3️⃣ ONLINE PAYMENT
-      await loadRazorpay();
-
-      const { data } = await API.post(
-        "/payment/create-order",
-        { orderId: order._id }
-      );
-
-      const options = {
-        key: data.key,
-        amount: data.amount,
-        currency: "INR",
-        name: "Ethnic Wear",
-        description: "Order Payment",
-        order_id: data.razorpayOrderId,
-        handler: async (response: any) => {
-          await API.post("/payment/verify", response);
-          clearCart();
-          alert("Payment successful");
-          router.push("/orders");
-        },
-      };
-
-      const razorpay = new (window as any).Razorpay(
-        options
-      );
-      razorpay.open();
-    } catch (err) {
-      alert("Checkout failed");
-    }
+  const placeOrder = () => {
+    alert("Order placed successfully!");
+    router.push("/");
   };
 
-  if (cart.length === 0) {
-    return <p className="p-10">Your cart is empty</p>;
-  }
-
   return (
-    <main className="max-w-xl mx-auto px-6 py-12">
-      <h1 className="text-2xl font-semibold mb-6">
-        Checkout
-      </h1>
+    <main className="max-w-4xl mx-auto px-4 py-8">
 
-      {/* ADDRESS */}
-      <input
-        placeholder="Full Name"
-        className="border w-full p-3 mb-3"
-        onChange={(e) => setFullName(e.target.value)}
-      />
-      <input
-        placeholder="Address"
-        className="border w-full p-3 mb-3"
-        onChange={(e) => setAddress(e.target.value)}
-      />
-      <input
-        placeholder="City"
-        className="border w-full p-3 mb-3"
-        onChange={(e) => setCity(e.target.value)}
-      />
-      <input
-        placeholder="Pincode"
-        className="border w-full p-3 mb-3"
-        onChange={(e) => setPincode(e.target.value)}
-      />
-      <input
-        placeholder="Phone"
-        className="border w-full p-3 mb-6"
-        onChange={(e) => setPhone(e.target.value)}
-      />
+      <h1 className="text-2xl font-semibold mb-6">Checkout</h1>
 
-      {/* PAYMENT METHOD */}
-      <div className="mb-6">
-        <p className="font-medium mb-2">
-          Payment Method
-        </p>
+      <div className="bg-white shadow rounded-xl p-6 space-y-4">
 
-        <label className="flex items-center gap-2 mb-2">
+        <div className="grid sm:grid-cols-2 gap-4">
           <input
-            type="radio"
-            checked={paymentMethod === "COD"}
-            onChange={() => setPaymentMethod("COD")}
+            placeholder="Full Name"
+            className="border rounded-lg px-4 py-2 w-full"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
           />
-          Cash on Delivery
-        </label>
 
-        <label className="flex items-center gap-2">
           <input
-            type="radio"
-            checked={paymentMethod === "RAZORPAY"}
-            onChange={() =>
-              setPaymentMethod("RAZORPAY")
-            }
+            placeholder="Phone"
+            className="border rounded-lg px-4 py-2 w-full"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
           />
-          Online Payment
-        </label>
+        </div>
+
+        <input
+          placeholder="Address"
+          className="border rounded-lg px-4 py-2 w-full"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          <input
+            placeholder="City"
+            className="border rounded-lg px-4 py-2 w-full"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+          />
+
+          <input
+            placeholder="Pincode"
+            className="border rounded-lg px-4 py-2 w-full"
+            value={pincode}
+            onChange={(e) => setPincode(e.target.value)}
+          />
+        </div>
+
+        {/* PAYMENT */}
+        <div className="pt-4">
+          <p className="font-medium mb-2">Payment Method</p>
+
+          <div className="flex gap-6">
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                checked={payment === "cod"}
+                onChange={() => setPayment("cod")}
+              />
+              Cash on Delivery
+            </label>
+
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                checked={payment === "online"}
+                onChange={() => setPayment("online")}
+              />
+              Online Payment
+            </label>
+          </div>
+        </div>
+
+        {/* TOTAL */}
+        <div className="flex justify-between items-center pt-6 border-t mt-6">
+          <h2 className="text-lg font-semibold">
+            Total: ₹{total}
+          </h2>
+
+          <button
+            onClick={placeOrder}
+            className="bg-black text-white px-8 py-3 rounded-lg hover:opacity-90 transition"
+          >
+            Place Order
+          </button>
+        </div>
       </div>
-
-      <p className="text-lg font-medium mb-4">
-        Total: ₹{totalAmount}
-      </p>
-
-      <button
-        onClick={placeOrder}
-        className="w-full bg-black text-white py-3 rounded"
-      >
-        {paymentMethod === "COD"
-          ? "Place Order"
-          : "Pay Now"}
-      </button>
     </main>
   );
 }

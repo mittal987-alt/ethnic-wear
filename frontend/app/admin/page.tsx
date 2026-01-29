@@ -73,7 +73,9 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="max-w-7xl mx-auto px-6 py-10">
+<main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-6 md:py-12">
+
+
       {/* HEADER */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -93,7 +95,7 @@ export default function AdminPage() {
 
       {/* STATS */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-10">
           <StatCard title="Total Orders" value={stats.totalOrders} />
           <StatCard title="Revenue" value={`₹${stats.totalRevenue}`} />
           <StatCard title="Delivered" value={stats.delivered} />

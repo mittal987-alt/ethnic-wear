@@ -12,8 +12,7 @@ export default function HomeSlider() {
 
   return (
     <div className="relative h-[420px] overflow-hidden">
-      <img src={slides[index]} className="w-full h-full object-cover" />
-
+      <img src={slides[index]}  className="w-full h-48 sm:h-56 object-cover rounded" />
       <button
         onClick={() => setIndex((index + 1) % slides.length)}
         className="absolute right-5 top-1/2 bg-white px-3 py-2 rounded"
