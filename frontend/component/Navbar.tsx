@@ -9,83 +9,83 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="border-b bg-white sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b shadow-sm">
+
+    <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
 
         {/* LOGO */}
-        <Link href="/" className="text-xl font-bold">
-          EthnicWear
+        <Link href="/" className="text-2xl font-bold">
+          <span className="text-rose-600">Ethnic</span>Wear
         </Link>
 
-        {/* DESKTOP MENU */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+        {/* DESKTOP */}
+        <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+
           <Link href="/category/kurti">Kurti</Link>
           <Link href="/category/suit">Suit</Link>
           <Link href="/category/lehenga">Lehenga</Link>
-          <Link href="/wishlist">Wishlist ❤️</Link>
-          <Link href="/cart">Cart 🛒</Link>
-          <Link href="/orders">my orders</Link>
 
-          {!user ? (
+          <Link href="/wishlist">❤️</Link>
+          <Link href="/cart">🛒</Link>
+          <Link href="/orders">📦</Link>
+
+          {user ? (
             <>
-              <Link href="/login" className="text-blue-600">Login</Link>
+              <Link href="/profile">👤</Link>
+              <button onClick={logout} className="text-red-600">
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="text-rose-600">Login</Link>
               <Link
                 href="/register"
-                className="bg-black text-white px-4 py-1 rounded"
+                className="bg-black text-white px-4 py-2 rounded-full"
               >
                 Register
               </Link>
             </>
-          ) : (
-            <button
-              onClick={logout}
-              className="text-red-600 font-medium"
-            >
-              Logout
-            </button>
           )}
+
         </nav>
 
-        {/* MOBILE BUTTON */}
+        {/* MOBILE */}
         <button
-          className="md:hidden text-2xl"
           onClick={() => setOpen(!open)}
+          className="md:hidden text-2xl"
         >
-          ☰
+          {open ? "✕" : "☰"}
         </button>
       </div>
 
-      {/* MOBILE DROPDOWN */}
+      {/* MOBILE MENU */}
       {open && (
-        <div className="md:hidden border-t bg-white px-4 py-4 space-y-3 text-sm">
+        <div className="md:hidden px-6 py-4 border-t space-y-4 bg-white text-sm">
 
-          <Link href="/category/kurti" onClick={() => setOpen(false)}>Kurti</Link>
-          <Link href="/category/suit" onClick={() => setOpen(false)}>Suit</Link>
-          <Link href="/category/lehenga" onClick={() => setOpen(false)}>Lehenga</Link>
-          <Link href="/wishlist" onClick={() => setOpen(false)}>Wishlist ❤️</Link>
-          <Link href="/cart" onClick={() => setOpen(false)}>Cart 🛒</Link>
-          <Link href="/orders" onClick={() => setOpen(false)}>my orders</Link>
-          {!user ? (
+   
+
+          <Link href="/wishlist">❤️ Wishlist</Link>
+          <Link href="/cart">🛒 Cart</Link>
+          <Link href="/orders">📦 Orders</Link>
+
+          {user ? (
             <>
-              <Link href="/login" onClick={() => setOpen(false)}>Login</Link>
+              <Link href="/profile">👤 Profile</Link>
+              <button onClick={logout} className="text-red-600">
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login">Login</Link>
               <Link
                 href="/register"
-                onClick={() => setOpen(false)}
-                className="block bg-black text-white px-4 py-2 rounded text-center"
+                className="block bg-black text-white py-2 rounded-full text-center"
               >
                 Register
               </Link>
             </>
-          ) : (
-            <button
-              onClick={() => {
-                logout();
-                setOpen(false);
-              }}
-              className="text-red-600"
-            >
-              Logout
-            </button>
           )}
         </div>
       )}

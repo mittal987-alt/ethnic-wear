@@ -29,6 +29,12 @@ export default function ProductCard({ product }: { product: Product }) {
           <p className="text-sm text-gray-500 capitalize">
             {product.category}
           </p>
+          {product.mrp && (
+  <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
+    {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
+  </span>
+)}
+
           <p className="mt-2 font-semibold text-pink-600">
             ₹{product.price}
           </p>

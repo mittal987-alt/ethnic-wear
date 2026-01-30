@@ -10,6 +10,10 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    mrp: {
+      type: Number,
+      required: true,
+    },
     category: {
       type: String,
       enum: ["kurti", "suit", "lehenga", "dupatta"],
@@ -20,6 +24,11 @@ const productSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+     stock: Number,
+
+     sizes: [String],    // ["S","M","L","XL"]
+     colors: [String],
+
     
     isTrending: {
       type: Boolean,
