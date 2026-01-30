@@ -100,7 +100,7 @@ export default function MyOrdersPage() {
                     <img
                       src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${item.image}`}
                       alt={item.title}
-                      c className="w-full h-48 sm:h-56 object-cover rounded" 
+                      className="w-full h-48 sm:h-56 object-cover rounded" 
                     />
                   )}
 
