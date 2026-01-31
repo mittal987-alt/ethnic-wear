@@ -10,6 +10,7 @@ export interface Product {
   createdAt?: string;
   images?: string[];
   stock?: number;
+  mrp?: number;
   sizes?: string[];   // ["S","M","L","XL"]
   colors?: string[];
 }
