@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import API from "../../services/api";
+import OrderTracking from "@/component/OrderTracking";
+
+/* ================= TYPES ================= */
 
 interface OrderItem {
   title: string;
@@ -10,36 +13,52 @@ interface OrderItem {
   image?: string;
 }
 
+interface TimelineItem {
+  status: string;
+  date: string;
+}
+
+interface ReturnRequest {
+  requested: boolean;
+  type?: "RETURN" | "REPLACE";
+  reason?: string;
+  status?: "Pending" | "Approved" | "Rejected";
+}
+
 interface Order {
   _id: string;
   items: OrderItem[];
   totalAmount: number;
   status: string;
   createdAt: string;
-  returnRequest?: {
-    requested: boolean;
-    type?: "RETURN" | "REPLACE";
-    reason?: string;
-    status?: "Pending" | "Approved" | "Rejected";
-  };
+
+  timeline?: TimelineItem[];
+  courier?: string;
+  trackingNumber?: string;
+  expectedDelivery?: string;
+
+  returnRequest?: ReturnRequest;
 }
+
+/* ================= PAGE ================= */
 
 export default function MyOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await API.get("/orders/my");
-        setOrders(res.data);
-      } catch {
-        alert("Please login to view orders");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchOrders = async () => {
+    try {
+      const res = await API.get("/orders/my");
+      setOrders(res.data.orders ?? res.data);
+    } catch (err) {
+      console.error(err);
+      alert("Please login to view orders");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchOrders();
   }, []);
 
@@ -49,14 +68,13 @@ export default function MyOrdersPage() {
       setOrders((prev) =>
         prev.map((o) => (o._id === orderId ? res.data : o))
       );
-    } catch {
+    } catch (err) {
+      console.error(err);
       alert("Unable to cancel order");
     }
   };
 
-  if (loading) {
-    return <p className="p-10">Loading orders...</p>;
-  }
+  if (loading) return <p className="p-10">Loading orders...</p>;
 
   if (orders.length === 0) {
     return (
@@ -68,25 +86,24 @@ export default function MyOrdersPage() {
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-
       <h1 className="text-2xl font-semibold mb-6">My Orders</h1>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         {orders.map((order) => (
-          <div key={order._id} className="border rounded p-5">
+          <div key={order._id} className="border rounded-lg p-6">
+
             {/* HEADER */}
             <div className="flex justify-between mb-4">
               <div>
-                <p className="text-sm text-gray-500">Order ID</p>
+                <p className="text-xs text-gray-500">Order ID</p>
                 <p className="font-mono text-sm">{order._id}</p>
               </div>
 
               <div className="text-right">
                 <p className="text-sm">
-                  Status:{" "}
-                  <span className="font-medium">{order.status}</span>
+                  Status: <span className="font-medium">{order.status}</span>
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-xs text-gray-500">
                   {new Date(order.createdAt).toLocaleDateString()}
                 </p>
               </div>
@@ -95,17 +112,17 @@ export default function MyOrdersPage() {
             {/* ITEMS */}
             <div className="space-y-4">
               {order.items.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-4">
+                <div key={idx} className="flex gap-4 items-center">
                   {item.image && (
                     <img
                       src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${item.image}`}
                       alt={item.title}
-                      className="w-full h-48 sm:h-56 object-cover rounded" 
+                      className="w-20 h-20 object-cover rounded"
                     />
                   )}
 
                   <div className="flex-1">
-                    <p>{item.title}</p>
+                    <p className="font-medium">{item.title}</p>
                     <p className="text-sm text-gray-500">
                       ₹{item.price} × {item.quantity}
                     </p>
@@ -114,21 +131,40 @@ export default function MyOrdersPage() {
               ))}
             </div>
 
-            {/* FOOTER */}
-            <div className="flex justify-between items-center mt-4">
-              <p className="font-medium">
-                Total: ₹{order.totalAmount}
+            {/* TRACKING */}
+            {order.courier && (
+              <div className="mt-4 text-sm">
+                🚚 <b>{order.courier}</b> — Tracking:{" "}
+                <span className="font-mono">{order.trackingNumber}</span>
+              </div>
+            )}
+
+            {order.expectedDelivery && (
+              <p className="text-sm text-gray-500 mt-1">
+                Expected delivery:{" "}
+                {new Date(order.expectedDelivery).toDateString()}
               </p>
+            )}
+
+            {/* TIMELINE */}
+            {order.timeline && (
+              <div className="mt-6">
+                <OrderTracking timeline={order.timeline} />
+              </div>
+            )}
+
+            {/* FOOTER */}
+            <div className="flex justify-between items-center mt-6">
+              <p className="font-semibold">Total: ₹{order.totalAmount}</p>
 
               <div className="flex gap-3">
-                {/* CANCEL */}
                 <button
                   disabled={
                     order.status === "Delivered" ||
                     order.status === "Cancelled"
                   }
                   onClick={() => cancelOrder(order._id)}
-                  className={`text-sm px-4 py-2 rounded ${
+                  className={`px-4 py-2 text-sm rounded ${
                     order.status === "Delivered" ||
                     order.status === "Cancelled"
                       ? "bg-gray-300 cursor-not-allowed"
@@ -138,14 +174,11 @@ export default function MyOrdersPage() {
                   Cancel
                 </button>
 
-                {/* RETURN / REPLACE */}
                 {order.status === "Delivered" &&
                   !order.returnRequest?.requested && (
                     <button
                       onClick={async () => {
-                        const reason = prompt(
-                          "Reason for return / replace?"
-                        );
+                        const reason = prompt("Reason for return / replace?");
                         if (!reason) return;
 
                         const type = confirm(
@@ -165,16 +198,13 @@ export default function MyOrdersPage() {
                           )
                         );
                       }}
-                      className="bg-orange-600 text-white text-sm px-4 py-2 rounded"
+                      className="bg-orange-600 text-white px-4 py-2 text-sm rounded"
                     >
                       Return / Replace
                     </button>
                   )}
               </div>
             </div>
-
-            {/* ORDER TIMELINE */}
-            <OrderTimeline status={order.status} />
 
             {/* RETURN STATUS */}
             {order.returnRequest?.requested && (
@@ -186,30 +216,5 @@ export default function MyOrdersPage() {
         ))}
       </div>
     </main>
-  );
-}
-
-
-/* 🔹 ORDER TIMELINE */
-function OrderTimeline({ status }: { status: string }) {
-  const steps = ["Placed", "Processing", "Shipped", "Delivered"];
-
-  return (
-    <div className="flex justify-between mt-4 text-xs">
-      {steps.map((step) => {
-        const active = steps.indexOf(step) <= steps.indexOf(status);
-        return (
-          <div
-            key={step}
-            className={`flex-1 text-center ${
-              active ? "text-green-600" : "text-gray-400"
-            }`}
-          >
-            <div className="w-2 h-2 mx-auto mb-1 rounded-full bg-current" />
-            {step}
-          </div>
-        );
-      })}
-    </div>
   );
 }

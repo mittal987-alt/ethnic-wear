@@ -158,6 +158,26 @@ router.get("/can-review/:productId", authMiddleware, async (req, res) => {
 
   res.json({ canReview: !!order });
 });
+router.put("/:id/status", authMiddleware, adminOnly, async (req, res) => {
+  const { status, courier, trackingNumber, expectedDelivery } = req.body;
+
+  const order = await Order.findById(req.params.id);
+  if (!order) return res.status(404).json({ message: "Order not found" });
+
+  order.status = status;
+
+  order.timeline.push({
+    status,
+    date: new Date(),
+  });
+
+  if (courier) order.courier = courier;
+  if (trackingNumber) order.trackingNumber = trackingNumber;
+  if (expectedDelivery) order.expectedDelivery = expectedDelivery;
+
+  await order.save();
+  res.json(order);
+});
 
 
 /* =========================

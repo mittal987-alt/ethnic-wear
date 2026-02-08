@@ -2,21 +2,15 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
   {
-    /* =========================
-       USER
-    ========================= */
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
 
-    /* =========================
-       ITEMS
-    ========================= */
     items: [
       {
-        productId: {
+        product: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
         },
@@ -27,17 +21,25 @@ const orderSchema = new mongoose.Schema(
       },
     ],
 
-    /* =========================
-       AMOUNT
-    ========================= */
     totalAmount: {
       type: Number,
       required: true,
     },
 
-    /* =========================
-       ORDER TIMELINE
-    ========================= */
+    status: {
+      type: String,
+      enum: [
+        "Placed",
+        "Confirmed",
+        "Packed",
+        "Shipped",
+        "Out for delivery",
+        "Delivered",
+        "Cancelled",
+      ],
+      default: "Placed",
+    },
+
     timeline: [
       {
         status: String,
@@ -45,34 +47,13 @@ const orderSchema = new mongoose.Schema(
       },
     ],
 
-    /* =========================
-       SHIPPING
-    ========================= */
-    shippingAddress: {
-      fullName: String,
-      address: String,
-      city: String,
-      pincode: String,
-      phone: String,
-    },
+    courier: String,
+    trackingNumber: String,
+    expectedDelivery: Date,
 
-    /* =========================
-       ORDER STATUS
-    ========================= */
-    status: {
-      type: String,
-      default: "Placed",
-    },
-
-    /* =========================
-       RETURN / REPLACE
-    ========================= */
     returnRequest: {
       requested: { type: Boolean, default: false },
-      type: {
-        type: String,
-        enum: ["RETURN", "REPLACE"],
-      },
+      type: { type: String, enum: ["RETURN", "REPLACE"] },
       reason: String,
       status: {
         type: String,
@@ -81,14 +62,6 @@ const orderSchema = new mongoose.Schema(
       },
     },
 
-    replacementFor: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Order",
-    },
-
-    /* =========================
-       PAYMENT
-    ========================= */
     paymentMethod: {
       type: String,
       enum: ["COD", "RAZORPAY"],
@@ -100,35 +73,16 @@ const orderSchema = new mongoose.Schema(
       enum: ["Pending", "Paid", "Refunded"],
       default: "Pending",
     },
-
-    // ✅ REQUIRED FOR REFUND
-    razorpayPaymentId: {
-      type: String,
-    },
-    items: [
-  {
-    product: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-    },
-    quantity: Number,
-    price: Number,
-  },
-],
-
-
-    razorpayOrderId: {
-      type: String,
-    },
-    status: {
-  type: String,
-  enum: ["Placed", "Processing", "Shipped", "Delivered", "Cancelled"],
+    deliveredAt: {
+  type: Date,
 },
 
+returnWindowDays: {
+  type: Number,
+  default: 7, // 👈 configurable
+},
 
-    refundId: {
-      type: String,
-    },
+    
   },
   { timestamps: true }
 );

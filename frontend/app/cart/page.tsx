@@ -33,7 +33,7 @@ export default function CartPage() {
           {item.image && (
             <img
               src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${item.image}`}
-               className="w-full h-48 sm:h-56 object-cover rounded"  />
+               className="w-24 h-24 sm:h-36 object-cover rounded"  />
           )}
 
           <div className="flex-1">

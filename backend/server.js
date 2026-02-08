@@ -1,3 +1,4 @@
+import"./loadEnv.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -5,7 +6,7 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-
+import mongoose from "mongoose";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
@@ -29,12 +30,12 @@ app.use(
   })
 );
 
-
+console.log("key id:", process.env.RAZORPAY_KEY_ID);
 // ✅ Serve uploaded images
 const __dirname = path.resolve();
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, "uploads"))
+  express.static(path.join( "uploads"))
 );
 
 /* ---------------- ROUTES ---------------- */
@@ -46,7 +47,7 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 
 /* ---------------- TEST ROUTE ---------------- */
-
+console.log("Razorpay:" , process.env.RAZORPAY_KEY_ID);
 app.get("/", (req, res) => {
   res.send("API is running...");
 });

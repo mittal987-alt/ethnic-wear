@@ -1,28 +1,24 @@
 "use client";
 
-import API from "@/services/api";
-import { useAuth } from "@/context/AuthContext";
+import { toggleWishlist } from "@/services/wishlist";
 
-export default function WishlistButton({
-  productId,
-}: {
+interface Props {
   productId: string;
-}) {
-  const { user } = useAuth();
+}
 
-  const toggleWishlist = async () => {
-    if (!user) {
-      alert("Please login first");
-      return;
-    }
-
-    await API.post(`/wishlist/${productId}`);
-  };
-
+export default function WishlistButton({ productId }: Props) {
   return (
     <button
-      onClick={toggleWishlist}
-      className="absolute top-2 right-2 text-xl"
+      onClick={async (e) => {
+        e.preventDefault(); // important when inside Link
+        try {
+          await toggleWishlist(productId);
+          alert("Wishlist updated");
+        } catch {
+          alert("Please login first");
+        }
+      }}
+      className="text-xl"
     >
       ❤️
     </button>

@@ -6,58 +6,55 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-/* CREATE RAZORPAY ORDER */
 router.post("/create-order", authMiddleware, async (req, res) => {
-  const { orderId } = req.body;
+  try {
+    const { orderId } = req.body;
 
-  const order = await Order.findById(orderId);
-  if (!order) return res.status(404).json({ message: "Order not found" });
+    const order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ message: "Order not found" });
 
-  const razorpayOrder = await razorpay.orders.create({
-    amount: order.totalAmount * 100, // paise
-    currency: "INR",
-    receipt: order._id.toString(),
-  });
+    const razorOrder = await razorpay.orders.create({
+      amount: order.totalAmount * 100,
+      currency: "INR",
+      receipt: order._id.toString(),
+    });
 
-  order.razorpayOrderId = razorpayOrder.id;
-  await order.save();
+    order.razorpayOrderId = razorOrder.id;
+    await order.save();
 
-  res.json({
-    razorpayOrderId: razorpayOrder.id,
-    amount: razorpayOrder.amount,
-    key: process.env.RAZORPAY_KEY_ID,
-  });
+    res.json({
+      razorpayOrderId: razorOrder.id,
+      amount: razorOrder.amount,
+      key: process.env.RAZORPAY_KEY_ID,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
 });
 
-/* VERIFY PAYMENT */
 router.post("/verify", authMiddleware, async (req, res) => {
-  const {
-    razorpay_order_id,
-    razorpay_payment_id,
-    razorpay_signature,
-  } = req.body;
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
-  const body = razorpay_order_id + "|" + razorpay_payment_id;
+    const sign = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest("hex");
 
-  const expectedSignature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-    .update(body)
-    .digest("hex");
+    if (sign !== razorpay_signature)
+      return res.status(400).json({ message: "Invalid signature" });
 
-  if (expectedSignature !== razorpay_signature) {
-    return res.status(400).json({ message: "Invalid signature" });
+    const order = await Order.findOne({ razorpayOrderId: razorpay_order_id });
+    order.paymentStatus = "Paid";
+    order.razorpayPaymentId = razorpay_payment_id;
+
+    await order.save();
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
-
-  const order = await Order.findOne({ razorpayOrderId: razorpay_order_id });
-  if (!order) return res.status(404).json({ message: "Order not found" });
-
-order.paymentStatus = "Paid";
-order.razorpayPaymentId = razorpay_payment_id; // ⭐ IMPORTANT
-order.razorpayOrderId = razorpay_order_id;     // keep for reference
-await order.save();
-
-
-  res.json({ success: true });
 });
 
 export default router;

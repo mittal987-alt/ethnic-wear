@@ -1,225 +1,120 @@
 "use client";
 
-import { useAuth } from "../../context/AuthContext";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import API from "../../services/api";
 import Link from "next/link";
-
-/* ---------- TYPES ---------- */
+import API from "../../services/api";
 
 interface Product {
   _id: string;
   title: string;
   price: number;
-  category: string;
-  isTrending: boolean;
+  stock: number;
 }
 
-interface Stats {
-  totalOrders: number;
-  totalRevenue: number;
-  delivered: number;
-  cancelled: number;
+interface Order {
+  _id: string;
+  totalAmount: number;
+  status: string;
+  createdAt: string;
 }
-
-/* ---------- COMPONENT ---------- */
 
 export default function AdminPage() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
-
   const [products, setProducts] = useState<Product[]>([]);
-  const [stats, setStats] = useState<Stats | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
 
-  /* 🔐 PROTECT ADMIN ROUTE */
   useEffect(() => {
-    if (loading) return;
+    API.get("/products").then(res => setProducts(res.data));
+    API.get("/orders").then(res => setOrders(res.data));
+  }, []);
 
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
+  const updateStatus = async (id: string, status: string) => {
+    const res = await API.put(`/orders/${id}/status`, { status });
 
-    if (user.role !== "admin") {
-      router.replace("/");
-    }
-  }, [user, loading, router]);
+    setOrders(prev =>
+      prev.map(o => o._id === id ? res.data : o)
+    );
+  };
 
-  /* 📊 FETCH STATS */
-  useEffect(() => {
-    if (user?.role === "admin") {
-      API.get("/orders/stats/admin").then((res) =>
-        setStats(res.data)
-      );
-    }
-  }, [user]);
+  const deleteProduct = async (id: string) => {
+    if (!confirm("Delete product?")) return;
 
-  /* 📦 FETCH PRODUCTS */
-  useEffect(() => {
-    if (user?.role === "admin") {
-      API.get("/products").then((res) =>
-        setProducts(res.data)
-      );
-    }
-  }, [user]);
-
-  if (loading) {
-    return <p className="p-10">Checking admin access...</p>;
-  }
-
-  if (!user || user.role !== "admin") {
-    return null;
-  }
+    await API.delete(`/products/${id}`);
+    setProducts(p => p.filter(x => x._id !== id));
+  };
 
   return (
-<main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-6 md:py-12">
+    <main className="max-w-7xl mx-auto px-4 py-10 space-y-16">
 
+      <h1 className="text-4xl font-bold">Admin Dashboard</h1>
 
-      {/* HEADER */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-semibold">Admin Dashboard</h1>
-          <p className="text-gray-600 mt-1">
-            Welcome, {user.name}
-          </p>
+      {/* ================= PRODUCTS ================= */}
+
+      <section>
+        <div className="flex justify-between mb-4">
+          <h2 className="text-2xl font-semibold">Products</h2>
+          <Link
+            href="/admin/add"
+            className="bg-black text-white px-4 py-2 rounded"
+          >
+            + Add Product
+          </Link>
+          <Link 
+          href="/admin/orders" className="bg-blue-600 text-white px-4 py-2 rounded">
+            All Orders
+          </Link>
+          <Link 
+          href="/admin/return" className="bg-purple-600 text-white px-4 py-2 rounded">
+            All Returns
+          </Link>
+          <Link 
+          href="/admin/customer" className="bg-green-600 text-white px-4 py-2 rounded">
+            All Customers
+          </Link>
+          
         </div>
 
-        <button
-          onClick={() => router.push("/admin/products/new")}
-          className="bg-black text-white px-6 py-3 rounded"
-        >
-          + Add Product
-        </button>
-      </div>
+        <div className="space-y-3">
 
-      {/* STATS */}
-      {stats && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-10">
-          <StatCard title="Total Orders" value={stats.totalOrders} />
-          <StatCard title="Revenue" value={`₹${stats.totalRevenue}`} />
-          <StatCard title="Delivered" value={stats.delivered} />
-          <StatCard title="Cancelled" value={stats.cancelled} />
-        </div>
-      )}
+          {products.map(p => (
+            <div
+              key={p._id}
+              className="border p-4 rounded flex justify-between items-center"
+            >
+              <div>
+                <p className="font-medium">{p.title}</p>
+                <p>₹{p.price}</p>
 
-      {/* QUICK LINKS */}
-      <div className="flex gap-6 mb-10">
-        <Link href="/admin/orders" className="underline">
-          Manage Orders
-        </Link>
-        <Link href="/admin/products/new" className="underline">
-          Add Product
-        </Link>
-      </div>
+                {p.stock < 5 && (
+                  <p className="text-red-600 text-sm">
+                    ⚠ Low stock: {p.stock}
+                  </p>
+                )}
+              </div>
 
-      {/* PRODUCT TABLE */}
-      <div className="overflow-x-auto">
-        <table className="w-full border border-gray-200">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-4 py-3 text-left">Title</th>
-              <th className="px-4 py-3 text-left">Category</th>
-              <th className="px-4 py-3 text-left">Price</th>
-              <th className="px-4 py-3 text-left">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {products.map((product) => (
-              <tr key={product._id} className="border-t">
-                <td className="px-4 py-3">{product.title}</td>
-                <td className="px-4 py-3 capitalize">
-                  {product.category}
-                </td>
-                <td className="px-4 py-3">₹{product.price}</td>
-
-                <td className="px-4 py-3 flex gap-4 items-center">
-                  {/* EDIT */}
-                  <button
-                    onClick={() =>
-                      router.push(`/admin/products/${product._id}`)
-                    }
-                    className="text-blue-600"
-                  >
-                    Edit
-                  </button>
-
-                  {/* TRENDING TOGGLE */
-                  }
-                  <button
-                  onClick={async () => {
-                  const url = product.isTrending
-                  ? `/products/${product._id}/trending/disable`
-                  : `/products/${product._id}/trending/enable`;
-
-                 const res = await API.put(url);
-
-                  setProducts((prev) =>
-                  prev.map((p) =>
-                   p._id === product._id ? res.data : p
-                    )
-                   );
-                 }}
-                 className={`text-sm ${
-                 product.isTrending ? "text-green-600" : "text-gray-500"
-                  } `}
-                  >
-                  {product.isTrending ? "★ Trending" : "☆ Make Trending"}
-                  </button>
-
-            
-
-                  {/* DELETE */}
-                  <button
-                    onClick={async () => {
-                      if (confirm("Delete this product?")) {
-                        await API.delete(`/products/${product._id}`);
-                        setProducts((prev) =>
-                          prev.filter(
-                            (p) => p._id !== product._id
-                          )
-                        );
-                      }
-                    }}
-                    className="text-red-600"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-
-            {products.length === 0 && (
-              <tr>
-                <td
-                  colSpan={4}
-                  className="text-center py-8 text-gray-500"
+              <div className="flex gap-3">
+                <Link
+                  href={`/admin/edit-product/${p._id}`}
+                  className="border px-3 py-1 rounded"
                 >
-                  No products added yet
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+                  Edit
+                </Link>
+
+                <button
+                  onClick={() => deleteProduct(p._id)}
+                  className="bg-red-600 text-white px-3 py-1 rounded"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ================= ORDERS ================= */}
+
+      
+
     </main>
-  );
-}
-
-/* ---------- STAT CARD ---------- */
-
-function StatCard({
-  title,
-  value,
-}: {
-  title: string;
-  value: string | number;
-}) {
-  return (
-    <div className="border rounded p-5 text-center">
-      <p className="text-gray-500">{title}</p>
-      <p className="text-2xl font-semibold mt-2">{value}</p>
-    </div>
   );
 }

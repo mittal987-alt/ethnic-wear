@@ -8,13 +8,6 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    const allowed = /jpg|jpeg|png|webp/;
-    const isValid = allowed.test(file.mimetype);
-    cb(null, isValid);
-  },
-});
+const upload = multer({ storage });
 
 export default upload;
