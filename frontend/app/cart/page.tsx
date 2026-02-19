@@ -32,7 +32,7 @@ export default function CartPage() {
         >
           {item.images && (
             <img
-              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${item.image}`}
+              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${item.images[0]}`}
                className="w-24 h-24 sm:h-36 object-cover rounded"  />
           )}
 
