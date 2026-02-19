@@ -9,6 +9,27 @@ interface RazorpayResponse {
   razorpay_payment_id: string;
   razorpay_signature: string;
 }
+
+interface RazorpayOptions {
+  key: string;
+  amount: number;
+  currency: string;
+  order_id: string;
+  handler: (response: RazorpayResponse) => void;
+}
+
+interface RazorpayInstance {
+  open(): void;
+  close(): void;
+}
+
+declare global {
+  interface Window {
+    Razorpay: {
+      new (options: RazorpayOptions): RazorpayInstance;
+    };
+  }
+}
 export default function CheckoutPage() {
   const { cart } = useCart();
   const router = useRouter();
@@ -29,68 +50,67 @@ export default function CheckoutPage() {
      MAIN PLACE ORDER BUTTON
   ============================ */
   const placeOrder = async () => {
+    if (payment === "cod") {
+      await API.post("/orders", {
+        items: cart.map(item => ({
+          product: item._id,
+          title: item.title,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.images?.[0]
+        })),
+        totalAmount: total,
+        shippingAddress: { fullName, address, city, pincode, phone },
+        paymentMethod: "COD",
+        paymentStatus: "Pending"
+      });
 
-  if (payment === "cod") {
-    await API.post("/orders", {
-      items: cart.map(item => ({
-        product: item._id,
-        title: item.title,
-        price: item.price,
-        quantity: item.quantity,
-        image: item.images?.[0]
-      })),
-      totalAmount: total,
-      shippingAddress: { fullName, address, city, pincode, phone },
-      paymentMethod: "COD",
-      paymentStatus: "Pending"
-    });
+      alert("Order placed!");
+      router.push("/orders");
+      return;
+    }
 
-    alert("Order placed!");
-    router.push("/orders");
-    return;
-  }
+    try {
+      // ✅ CREATE ORDER FIRST
+      const orderRes = await API.post("/orders", {
+        items: cart.map(item => ({
+          product: item._id,
+          title: item.title,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.images?.[0]
+        })),
+        totalAmount: total,
+        shippingAddress: { fullName, address, city, pincode, phone },
+        paymentMethod: "RAZORPAY",
+        paymentStatus: "Pending"
+      });
 
-  try {
-    // ✅ CREATE ORDER FIRST
-    const orderRes = await API.post("/orders", {
-      items: cart.map(item => ({
-        product: item._id,
-        title: item.title,
-        price: item.price,
-        quantity: item.quantity,
-        image: item.images?.[0]
-      })),
-      totalAmount: total,
-      shippingAddress: { fullName, address, city, pincode, phone },
-      paymentMethod: "RAZORPAY",
-      paymentStatus: "Pending"
-    });
+      const orderId = orderRes.data._id;
 
-    const orderId = orderRes.data._id;
+      // ✅ NOW CREATE RAZORPAY ORDER
+      const payRes = await API.post("/payment/create-order", { orderId });
 
-    // ✅ NOW CREATE RAZORPAY ORDER
-    const payRes = await API.post("/payment/create-order", { orderId });
+      const options: RazorpayOptions = {
+        key: payRes.data.key,
+        amount: payRes.data.amount,
+        currency: "INR",
+        order_id: payRes.data.razorpayOrderId,
+        handler: async (response: RazorpayResponse) => {
+          await API.post("/payment/verify", response);
+          alert("Payment successful!");
+          router.push("/orders");
+        }
+      };
 
-    const options = {
-      key: payRes.data.key,
-      amount: payRes.data.amount,
-      currency: "INR",
-      order_id: payRes.data.razorpayOrderId,
+      new window.Razorpay(options).open();
 
-      handler: async (response:RazorpayResponse) => {
-        await API.post("/payment/verify", response);
-        alert("Payment successful!");
-        router.push("/orders");
-      }
-    };
+    } catch (err) {
+      console.error("PAYMENT FLOW ERROR:", err);
+      alert("Payment failed");
+    }
+  };
 
-    new window.Razorpay(options).open();
-
-  } catch (err) {
-    console.error("PAYMENT FLOW ERROR:", err);
-    alert("Payment failed");
-  }
-};
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8">
@@ -178,4 +198,5 @@ export default function CheckoutPage() {
       </div>
     </main>
   );
+
 }
