@@ -4,7 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../../context/CartContext";
 import API from "../../services/api";
-
+interface RazorpayResponse {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
 export default function CheckoutPage() {
   const { cart } = useCart();
   const router = useRouter();
@@ -73,7 +77,7 @@ export default function CheckoutPage() {
       currency: "INR",
       order_id: payRes.data.razorpayOrderId,
 
-      handler: async (response) => {
+      handler: async (response:RazorpayResponse) => {
         await API.post("/payment/verify", response);
         alert("Payment successful!");
         router.push("/orders");
