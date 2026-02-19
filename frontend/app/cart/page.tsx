@@ -30,7 +30,7 @@ export default function CartPage() {
           key={item._id}
           className="flex gap-6 items-center border-b py-4"
         >
-          {item.image && (
+          {item.images && (
             <img
               src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${item.image}`}
                className="w-24 h-24 sm:h-36 object-cover rounded"  />
