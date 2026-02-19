@@ -8,7 +8,7 @@ interface CartItem {
   _id: string;
   title: string;
   price: number;
-  image?: string;
+  image?: string[];
   quantity: number;
 }
 
