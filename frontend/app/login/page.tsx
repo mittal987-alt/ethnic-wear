@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
-
+import axios, { AxiosError } from "axios";
+import Image from "next/image";
 import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
-
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,8 +36,13 @@ export default function LoginPage() {
       toast.success("Welcome back 🎉");
 
       setTimeout(() => router.push("/"), 1200);
-    } catch (err) {
-      toast.error(err?.response?.data?.message || "Invalid credentials");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const msg = (err.response?.data as { message?: string })?.message || "Invalid credentials";
+        toast.error(msg);
+      } else {
+        toast.error("Something went wrong");
+      }
     } finally {
       setLoading(false);
     }
