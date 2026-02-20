@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useCart } from "../../../context/CartContext";
 import API from "../../../services/api";
@@ -57,22 +58,37 @@ export default function ProductDetailPage() {
         {/* IMAGE SLIDER */}
         <div>
           <div className="bg-gray-100 rounded-xl p-4">
-            <img
-              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${product.images?.[active]}`}
+            <Image
+              src={
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}${product.images?.[active] ?? "/uploads/placeholder.png"}`
+              }
+              alt={product.title}
+              width={1000}
+              height={600}
               className="w-full max-h-[500px] object-cover rounded-lg"
+              unoptimized
             />
           </div>
 
           <div className="flex gap-3 mt-4">
             {product.images?.map((img, i) => (
-              <img
+              <button
                 key={i}
-                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${img}`}
                 onClick={() => setActive(i)}
-                className={`w-20 h-20 object-cover rounded border cursor-pointer ${
+                className={`rounded overflow-hidden border cursor-pointer ${
                   active === i ? "border-black" : ""
                 }`}
-              />
+                aria-label={`View image ${i + 1}`}
+              >
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${img}`}
+                  alt={`${product.title} ${i + 1}`}
+                  width={80}
+                  height={80}
+                  className="w-20 h-20 object-cover"
+                  unoptimized
+                />
+              </button>
             ))}
           </div>
         </div>
@@ -156,7 +172,7 @@ export default function ProductDetailPage() {
                 _id: product._id,
                 title: product.title,
                 price: product.price,
-                image: product.images?.[0],
+                  images: product.images,
                 quantity: 1,
               })
             }

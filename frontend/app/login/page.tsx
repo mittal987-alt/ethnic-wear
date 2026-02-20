@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import Image from "next/image";
 import API from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
@@ -69,9 +69,11 @@ export default function LoginPage() {
               transition={{ duration: 0.6 }}
               className="bg-black rounded-2xl p-10 shadow-xl"
             >
-              <img
+              <Image
                 src="/logo.png"
                 alt="Brand"
+                width={208}
+                height={208}
                 className="w-52"
               />
             </motion.div>
