@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import { AxiosError } from "axios";
 import toast, { Toaster } from "react-hot-toast";
 
 import API from "../../services/api";
@@ -39,7 +41,8 @@ export default function RegisterPage() {
 
       setTimeout(() => router.push("/"), 1200);
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Registration failed");
+      const error = err as AxiosError;
+      toast.error((error.response?.data as {message?: string})?.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -66,9 +69,11 @@ export default function RegisterPage() {
               transition={{ duration: 0.6 }}
               className="bg-black rounded-2xl p-10 shadow-xl"
             >
-              <img
+              <Image
                 src="/logo.png"
                 alt="Brand"
+                width={208}
+                height={208}
                 className="w-52"
               />
             </motion.div>
